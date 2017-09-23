@@ -46,10 +46,13 @@ AFTER ALL ROUNDS
   Inverse IP table applied
 DECRYPTION
   https://cstheory.stackexchange.com/questions/2543/how-can-des-have-6x4-s-boxes-and-still-be-reversible
-  Largely the same as encryption, except: 
-    If encryption is: 
+  Largely the same as encryption, except:
+    If encryption is:
       L(i+1) = R(i)
       R(i+1) = L(i)⊕F(R(i),K(i))
     Decryption will be:
       R(i) = L(i+1)
       L(i) = R(i+1)⊕F(L(i+1),K(i))
+
+
+Contribution
