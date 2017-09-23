@@ -54,7 +54,6 @@ DECRYPTION
       R(i) = L(i+1)
       L(i) = R(i+1)⊕F(L(i+1),K(i))
 
-
+      TEST
       askdnf;lknvas
       aefwefrswed
-      
