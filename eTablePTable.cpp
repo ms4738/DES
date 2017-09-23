@@ -1,7 +1,8 @@
 #include <iostream>
+#include <bitset>
 using namespace std;
 
-char* eTablePerm(char inputArray[])
+bitset eTablePerm(bitset inputArray[])
 {
   short outputArraySize = 48;
   short eTable[outputArraySize] = {32, 1,  2,  3,  4,  5,
@@ -12,7 +13,7 @@ char* eTablePerm(char inputArray[])
                                    24, 25, 26, 27, 28, 29,
                                    28, 29, 30, 31, 32, 1};
 
-  char* outputArray = (char*)malloc(outputArraySize * sizeof(char));
+  bitset<outputArraySize> outputArray; = (char*)malloc(outputArraySize * sizeof(char));
   for (short i = 0; i < outputArraySize; i++)
   {
     outputArray[i] = inputArray[eTable[i]];
