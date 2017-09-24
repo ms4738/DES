@@ -1,35 +1,43 @@
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 #include <string>
 using namespace std;
 
 
 int main()
 {
-    // TODO: make if statement for Encryption/Decryption
-    cout << "Please enter a file containing plain text: " << endl;
-    string input;
-    cin >> input;
-    cout << "Your file name was:" << endl << input << endl;
 
-    ifstream plainTextFileStream;
-    plainTextFileStream.open (input);
-    string output;
-    cout << "trying to open " << input << endl;
-    if (plainTextFileStream.is_open()) {
-        cout << input << "  File is open" << endl;
-        while (!plainTextFileStream.eof()) {
-            plainTextFileStream >> output;
-            cout<<output;
-            ofstream output ("ciphertext.txt");
-            if (myfile.is_open()){
-                myfile << "This is a line.\n";
-                myfile << "This is another line.\n";
-                myfile.close();
+    cout << "Please enter \'e\' to encrypt or \'d\' to decrypt." << endl;
+    char mode;
+    cin >> mode;
+    do {
+        if (mode == 'e'){
+            // string plainTextFileName = "pt.txt";
+            // cout << "trying to open " << plainTextFileName << endl;
+            ifstream plainTextFileStream;
+            plainTextFileStream.open("pt.txt");
+
+            string output;
+            if (plainTextFileStream.is_open()) {
+                // cout << plainTextFileName << "File is open" << endl;
+                while (!plainTextFileStream.eof()) {
+                    plainTextFileStream >> output;
+                    cout << output;
+                    // TODO: Open Output File
+                }
             }
-            else cout << "Unable to open file";
+            else {
+                cout << "The file was not able to be opened." << endl;
+            }
+            plainTextFileStream.close();
+            break;
         }
-    }
-    plainTextFileStream.close();
+        else if (mode == 'd'){
+            // TODO: fill in
+        }
+        // Input not e or d. Try again
+        cout << "Please enter \'e\' to encrypt or \'d\' to decrypt." << endl;
+        cin >> mode;
+    } while (mode != 'e' || mode != 'd');
     return 0;
 }
