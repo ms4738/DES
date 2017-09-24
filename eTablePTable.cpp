@@ -3,11 +3,14 @@
 #include<vector>
 using namespace std;
 
+//Takes in a vector of size 32, expands and permutes it with a hard-coded table,
+//and returns a vector of size 48
 vector<bool> eTablePerm(vector<bool> inputVector)
 {
   short outputVectorSize = 48;
   short eTable[outputVectorSize] = {32, 1,  2,  3,  4,  5,
                                     4,  5,  6,  7,  8,  9,
+                                    8,  9,  10, 11, 12, 13,
                                     12, 13, 14, 15, 16, 17,
                                     16, 17, 18, 19, 20, 21,
                                     20, 21, 22, 23, 24, 25,
@@ -17,11 +20,13 @@ vector<bool> eTablePerm(vector<bool> inputVector)
 
   for (short i = 0; i < outputVectorSize; i++)
   {
-    outputVector.push_back(inputVector.at(eTable[i]));
+    outputVector.push_back(inputVector.at(eTable[i] - 1));
   }
   return outputVector;
 }
 
+//Takes in vector of size 32, permutes it using a hard-coded table,
+//and returns another vector of size 32
 vector<bool> pTablePerm(vector<bool> inputVector)
 {
   short outputVectorSize = 32;
@@ -32,7 +37,7 @@ vector<bool> pTablePerm(vector<bool> inputVector)
   vector<bool> outputVector;
   for (short i = 0; i < outputVectorSize; i++)
   {
-    outputVector.push_back(inputVector.at(pTable[i]));
+    outputVector.push_back(inputVector.at(pTable[i] - 1));
   }
   return outputVector;
 }
@@ -40,6 +45,23 @@ vector<bool> pTablePerm(vector<bool> inputVector)
 
 int main()
 {
+  //Vector for testing
+  vector<bool> testVect;
+  for (int i = 0; i < 32; i++)
+  {
+    if (i < 16)
+    {
+      testVect.push_back(0);
+    }
+    else
+    {
+      testVect.push_back(1);
+    }
+    //testVect.push_back(i % 2);
+  }
+
+  vector<bool> test2 = eTablePerm(testVect);
+  vector<bool> test3 = pTablePerm(test2);
   cout << "Hello, world!" << endl;
   return 0;
 }
