@@ -12,8 +12,6 @@ int main()
     cin >> mode;
     do {
         if (mode == 'e'){
-            // string plainTextFileName = "pt.txt";
-            // cout << "trying to open " << plainTextFileName << endl;
             ifstream plainTextFileStream;
             plainTextFileStream.open("pt.txt");
 
