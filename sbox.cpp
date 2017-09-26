@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-void SBoxes(vector<bool> inputVector)
+vector<bool> SBoxes(vector<bool> inputVector)
 {
   short s1[4][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
                      {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -57,14 +57,6 @@ void SBoxes(vector<bool> inputVector)
     }
     sboxes.push_back(temp);
   }
-  for(int i=0; i < 8; i++)
-  {
-    for(int j=0; j<6; j++)
-    {
-      cout << sboxes[i][j];
-    }
-    cout <<endl;
-  }
 
   for(int j=0; j <8; j++)
   {
@@ -82,67 +74,61 @@ void SBoxes(vector<bool> inputVector)
     if (j == 0)
     {
       newbinary= (s1[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 1)
     {
       newbinary= (s2[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 2)
     {
       newbinary= (s3[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 3)
     {
       newbinary= (s4[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 4)
     {
       newbinary= (s5[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 5)
     {
       newbinary= (s6[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 6)
     {
       newbinary= (s7[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
     if (j == 7)
     {
      newbinary= (s8[row.to_ulong()][col.to_ulong()]);
-      cout << newbinary;
     }
-    cout << endl;
 
-    for(int i=3; i>=0; i--)
+    for(int i=0; i<4; i++)
     {
-      //cout << newbinary[i]<< endl;
       outputvector.push_back(newbinary[i]);
     }
 
   }
-  for(int i=0; i<32; i++)
-  {
-    cout << outputvector.at(i);
-  }
+
+  return outputvector;
 
 }
 int main()
 {
   bitset<48> bs(15);
+  cout << "Initial: " << endl;
   cout << bs << endl;
   vector<bool> bitsetvec;
   for(int i=0; i < 64; i++)
   {
     bitsetvec.push_back(bs[i]);
- }
- SBoxes(bitsetvec);
+  }
+  vector<bool> sboxVector = SBoxes(bitsetvec);
+  cout << "Sbox Result: " << endl;
+  for(int i=0; i<32; i++)
+  {
+    cout << sboxVector.at(i);
+  }
 
 }
