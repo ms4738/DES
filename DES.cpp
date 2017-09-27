@@ -7,7 +7,7 @@ using namespace std;
 
 const short CHARS_IN_BLOCK = 8;
 const short BITS_IN_CHAR = 8;
-const short ROUND_COUNT = 8;
+const short ROUND_COUNT = 1;
 
 //IP Table, takes in vector of size 64, permutes it, and modifies
 //left and right vectors passed by reference to give plaintext halves
@@ -247,7 +247,7 @@ vector<bool> sBoxSub(vector<bool> rightTextI)
   sBoxes.push_back(tempBox);
 
   vector<vector<bool>> charGroups;
-  vector<bool> outputvector;
+  vector<bool> outputVector;
   for(int i=0; i < charGroupCount; i++)
   {
     vector<bool> temp;
@@ -260,29 +260,35 @@ vector<bool> sBoxSub(vector<bool> rightTextI)
 
   for(int j=0; j <charGroupCount; j++)
   {
-    string rowstring;
-    string colstring;
-    rowstring.append(charGroups.at(j).at(0) ? "1" : "0");
-    rowstring.append(charGroups.at(j).at(5) ? "1" : "0");
+    string rowString;
+    string colString;
+    rowString.append(charGroups.at(j).at(0) ? "1" : "0");
+    rowString.append(charGroups.at(j).at(charsInGroup - 1) ? "1" : "0");
     for(int i = 1; i <5; i++)
     {
-      colstring.append(charGroups.at(j).at(i) ? "1" : "0");
+      colString.append(charGroups.at(j).at(i) ? "1" : "0");
     }
-    bitset<2> row (rowstring);
-    bitset<4> col (colstring);
-    bitset<4> newbinary;
-    newbinary = sBoxes.at(j).at(row.to_ulong()).at(col.to_ulong());
-    cout << "SBOXES ";
+    bitset<2> row (rowString);
+    bitset<4> col (colString);
+    bitset<4> newBinary;
+    newBinary = sBoxes.at(j).at(row.to_ulong()).at(col.to_ulong());
+    //cout << "row: " << rowString << " col: " << colString << " SBox: " << j+1 << " Permuted: ";
     for(int i=3; i>=0; i--)
     {
-      cout << (newbinary[i] ? "1" : "0") << " ";
-      outputvector.push_back(newbinary[i]);
+      //cout << (newBinary[i] ? "1" : "0") << " ";
+      outputVector.push_back(newBinary[i]);
+    }
+    /*
+    cout << "Vec: ";
+    for (unsigned int i = 0; i < outputvector.size(); i++)
+    {
+      cout << (outputVector.at(i) ? "1" : "0");
     }
     cout << endl;
-
+    */
   }
 
-  return outputvector;
+  return outputVector;
 }
 
 //Key shift scheduler, takes in key halves and shifts them by a specified
@@ -302,6 +308,19 @@ vector<bool> leftShiftSched(vector<bool> inputVector, short round)
    return outputvector;
 }
 
+void printVector(vector<bool> inputVec)
+{
+  for (unsigned int i = 0; i < inputVec.size(); i++)
+  {
+    cout << inputVec.at(i);
+    if (((i + 1) % 8 == 0) && (i != 0))
+    {
+      cout << " ";
+    }
+  }
+  cout << endl;
+}
+
 //Takes in a size 64 vector of booleans for both plaintext and the key
 //and performs DES encryption on them. Returns string of ciphertext for the
 //input block of plaintext
@@ -318,50 +337,90 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   initPerm(plainTextBits, leftTextI, rightTextI);
   pc1Perm(keyBits, leftKey, rightKey);
 
+  cout << "Original plaintext: \n";
+  printVector(plainTextBits);
+  cout << "Original key: \n";
+  printVector(keyBits);
+
+  cout << "Right half plaintext after init perm\n";
+  printVector(rightTextI);
+  cout << "left half plaintext after init perm\n";
+  printVector(leftTextI);
+  cout <<"left half key after pc1Perm: \n";
+  printVector(leftKey);
+  cout << "right half key after pc1Perm: \n";
+  printVector(rightKey);
+
+
   for (short i = 0; i < ROUND_COUNT; i++)
   {
+    cout << endl;
+    cout << "Current round: " << i << endl;
+    cout << endl;
     leftTextIPlus1 = rightTextI;
     //Right text is permuted and expanded to 48 bits
     rightTextI = eTablePerm(rightTextI);
+    cout  << "right half after etable:\n";
+    printVector(rightTextI);
     //PC-2 Table permutation for keys, also now 48 bits
     leftKey = leftShiftSched(leftKey, i);
     rightKey = leftShiftSched(rightKey, i);
+    cout << "left key after shift:\n";
+    printVector(leftKey);
+    cout << "right key after shift:\n";
+    printVector(rightKey);
     permKey = pc2Perm(leftKey, rightKey);
+    cout << "key after pc2perm:\n";
+    printVector(permKey);
     for (unsigned short j = 0; j < rightTextI.size(); j++)
     {
       //XOR each bit of the right text with the key
       rightTextI.at(j) = rightTextI.at(j)^permKey.at(j);
     }
+    cout << "Right text after first xor:\n";
+    printVector(rightTextI);
     rightTextI = sBoxSub(rightTextI);
+    cout << "Right text after sboxes:\n";
+    printVector(rightTextI);
     rightTextI = pTablePerm(rightTextI);
+    cout << "Right text after ptable:\n";
+    printVector(rightTextI);
     for (unsigned short j = 0; j < rightTextI.size(); j++)
     {
       //XOR each bit of the right text with the key
       rightTextI.at(j) = rightTextI.at(j)^leftTextI.at(j);
     }
+    cout << "text after second xor:\n";
+    printVector(rightTextI);
     leftTextI = leftTextIPlus1;
+    cout << "left text:\n";
+    printVector(leftTextI);
   }
   //32-bit swap
   rightTextI.insert(rightTextI.end(), leftTextI.begin(), leftTextI.end());
+  cout << "text after 32 bit swap:\n";
+  printVector(rightTextI);
   //Inverse IP Table
   rightTextI = invInitPerm(rightTextI);
+  cout << "text after inverse ip table:\n";
+  printVector(rightTextI);
 
   //Converting binary back into chars
   for (int i = 0; i < CHARS_IN_BLOCK; i++)
   {
     string tempString = "";
-    cout << "0\n";
+    //cout << "0\n";
     for (int j = 0; j < BITS_IN_CHAR; j++)
     {
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
-      cout << (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0") << " ";
+      //cout << (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0") << " ";
     }
-    cout << "\n1\n" << tempString << endl;
+  //  cout << "\n1\n" << tempString << endl;
     bitset<BITS_IN_CHAR> temp(tempString);
     cryptText += (char)temp.to_ulong();
-    cout << "2" << "\n" << char(temp.to_ulong()) << endl;
+    //cout << "2" << "\n" << char(temp.to_ulong()) << endl;
   }
-  cout << "3 " << cryptText << endl;
+//  cout << "3 " << cryptText << endl;
   return cryptText;
 }
 
@@ -463,15 +522,11 @@ int main()
 
         vector<bool> keyBits;
         bitset<64> tempSet('A');
-        string tempString = tempSet.to_string();
-        cout << tempString << endl;
         //TODO Reverse loops?
         for (int j = 63; j >= 0; j--)
         {
           keyBits.push_back(tempSet[j]);
-          cout << tempSet[j] << " ";
         }
-        cout << endl;
         /*
         for (short i = 0; i < CHARS_IN_BLOCK; i++)
         {
