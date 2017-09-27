@@ -14,16 +14,17 @@ const short ROUND_COUNT = 8;
 void initPerm(vector<bool> inputVector, vector<bool>& leftText,
   vector<bool>& rightText)
 {
+  short outputVectorSize = 64;
   short initPerm[] = {58,50,42,34,26,18,10,2,
                       60,52,44,36,28,20,12,4,
-                 62,54,46,38,30,22,14,6,
-                 64,56,48,40,32,24,16,8,
-                 57,49,41,33,25,17,9,1,
-                 59,51,43,35,27,19,11,3,
-                 61,53,45,37,29,21,13,5,
-                 63,55,47,39,31,23,15,7};
+                      62,54,46,38,30,22,14,6,
+                      64,56,48,40,32,24,16,8,
+                      57,49,41,33,25,17,9,1,
+                      59,51,43,35,27,19,11,3,
+                      61,53,45,37,29,21,13,5,
+                      63,55,47,39,31,23,15,7};
   vector<bool> permVec;
-  for(short i=0; i < 64; i++)
+  for(short i=0; i < outputVectorSize; i++)
   {
     permVec.push_back(inputVector.at(initPerm[i]-1));
   }
@@ -35,23 +36,23 @@ void initPerm(vector<bool> inputVector, vector<bool>& leftText,
   {
     rightText.push_back(permVec.at(i));
   }
-
 }
 
 //Inverse IP table, takes in vector of booleans of size 64 and returns
 //its permutation
 vector<bool> invInitPerm(vector<bool> inputVector)
 {
+  short outputVectorSize = 64;
   short invInitPerm[] = {40,8,48,16,56,24,64,32,
-                       39,7,47,15,55,23,63,31,
-                       38,6,46,14,54,22,62,30,
-                       37,5,45,13,53,21,61,29,
-                       36,4,44,12,52,20,60,28,
-                       35,3,43,11,51,19,59,27,
-                       34,2,42,10,50,18,58,26,
-                       33,1,41,9,49,17,57,25};
+                         39,7,47,15,55,23,63,31,
+                         38,6,46,14,54,22,62,30,
+                         37,5,45,13,53,21,61,29,
+                         36,4,44,12,52,20,60,28,
+                         35,3,43,11,51,19,59,27,
+                         34,2,42,10,50,18,58,26,
+                         33,1,41,9,49,17,57,25};
   vector<bool> vec;
-  for(short i=0; i < 64; i++)
+  for(short i=0; i < outputVectorSize; i++)
   {
     vec.push_back(inputVector.at(invInitPerm[i]-1));
   }
@@ -103,13 +104,13 @@ void pc1Perm(vector<bool> keyBits, vector<bool>& leftKey, vector<bool>& rightKey
 {
   short pcOneSize = 56;
   short pcOne[]= {57,49,41,33,25,17,9,
-              1,58,50,42,34,26,18,
-              10,2,59,51,43,35,27,
-              19,11,3,60,52,44,36,
-              63,55,47,39,31,23,15,
-              7,62,54,46,38,30,22,
-              14,6,61,53,45,37,29,
-              21,13,5,28,20,12,4};
+                  1,58,50,42,34,26,18,
+                  10,2,59,51,43,35,27,
+                  19,11,3,60,52,44,36,
+                  63,55,47,39,31,23,15,
+                  7,62,54,46,38,30,22,
+                  14,6,61,53,45,37,29,
+                  21,13,5,28,20,12,4};
   for(int i=0; i<pcOneSize / 2; i++)
   {
     leftKey.push_back(keyBits.at(pcOne[i]-1));
@@ -145,108 +146,139 @@ vector<bool> pc2Perm(vector<bool> leftKey, vector<bool> rightKey)
 //and returns a permuted and substituted vector of length 32
 vector<bool> sBoxSub(vector<bool> rightTextI)
 {
-  short s1[4][16] = {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
-                     {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
-                     {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
-                     {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}};
+  short charGroupCount = 8;
+  short charsInGroup = 6;
+  vector<vector<vector<short>>> sBoxes;
+  vector<short> tempRow;
+  vector<vector<short>> tempBox;
+  //S Box 1
+  tempRow = {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7};
+  tempBox.push_back(tempRow);
+  tempRow = {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8};
+  tempBox.push_back(tempRow);
+  tempRow = {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0};
+  tempBox.push_back(tempRow);
+  tempRow = {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s2[4][16] = {{15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10},
-                     {3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5},
-                     {0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
-                     {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9}};
+  ////S Box 2
+  tempRow = {15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10};
+  tempBox.push_back(tempRow);
+  tempRow = {3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5};
+  tempBox.push_back(tempRow);
+  tempRow = {0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15};
+  tempBox.push_back(tempRow);
+  tempRow = {13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s3[4][16] = {{10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8},
-                     {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1},
-                     {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7},
-                     {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12}};
+  //S Box 3
+  tempRow = {10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8};
+  tempBox.push_back(tempRow);
+  tempRow = {13, 7, 0, 9, 3, 4, 6, 10, 2, 8, 5, 14, 12, 11, 15, 1};
+  tempBox.push_back(tempRow);
+  tempRow = {13, 6, 4, 9, 8, 15, 3, 0, 11, 1, 2, 12, 5, 10, 14, 7};
+  tempBox.push_back(tempRow);
+  tempRow = {1, 10, 13, 0, 6, 9, 8, 7, 4, 15, 14, 3, 11, 5, 2, 12};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s4[4][16] = {{7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15},
-                     {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9},
-                     {10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4},
-                     {3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14}};
+  //S Box 4
+  tempRow = {7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15};
+  tempBox.push_back(tempRow);
+  tempRow = {13, 8, 11, 5, 6, 15, 0, 3, 4, 7, 2, 12, 1, 10, 14, 9};
+  tempBox.push_back(tempRow);
+  tempRow = {10, 6, 9, 0, 12, 11, 7, 13, 15, 1, 3, 14, 5, 2, 8, 4};
+  tempBox.push_back(tempRow);
+  tempRow = {3, 15, 0, 6, 10, 1, 13, 8, 9, 4, 5, 11, 12, 7, 2, 14};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s5[4][16] = {{2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9},
-                     {14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6},
-                     {4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14},
-                     {11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3}};
+  //S Box 5
+  tempRow = {2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9};
+  tempBox.push_back(tempRow);
+  tempRow = {14, 11, 2, 12, 4, 7, 13, 1, 5, 0, 15, 10, 3, 9, 8, 6};
+  tempBox.push_back(tempRow);
+  tempRow = {4, 2, 1, 11, 10, 13, 7, 8, 15, 9, 12, 5, 6, 3, 0, 14};
+  tempBox.push_back(tempRow);
+  tempRow = {11, 8, 12, 7, 1, 14, 2, 13, 6, 15, 0, 9, 10, 4, 5, 3};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s6[4][16] = {{12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11},
-                     {10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8},
-                     {9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6},
-                     {4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13}};
+  //S Box 6
+  tempRow = {12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11};
+  tempBox.push_back(tempRow);
+  tempRow = {10, 15, 4, 2, 7, 12, 9, 5, 6, 1, 13, 14, 0, 11, 3, 8};
+  tempBox.push_back(tempRow);
+  tempRow = {9, 14, 15, 5, 2, 8, 12, 3, 7, 0, 4, 10, 1, 13, 11, 6};
+  tempBox.push_back(tempRow);
+  tempRow = {4, 3, 2, 12, 9, 5, 15, 10, 11, 14, 1, 7, 6, 0, 8, 13};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s7[4][16] = {{4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1},
-                     {13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6},
-                     {1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2},
-                     {6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12}};
+  //S Box 7
+  tempRow = {4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1};
+  tempBox.push_back(tempRow);
+  tempRow = {13, 0, 11, 7, 4, 9, 1, 10, 14, 3, 5, 12, 2, 15, 8, 6};
+  tempBox.push_back(tempRow);
+  tempRow = {1, 4, 11, 13, 12, 3, 7, 14, 10, 15, 6, 8, 0, 5, 9, 2};
+  tempBox.push_back(tempRow);
+  tempRow = {6, 11, 13, 8, 1, 4, 10, 7, 9, 5, 0, 15, 14, 2, 3, 12};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+  tempBox.clear();
 
-  short s8[4][16] = {{13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7},
-                     {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2},
-                     {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
-                     {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
-  vector<vector<bool>> sboxes;
+  //S Box 8
+  tempRow = {13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7};
+  tempBox.push_back(tempRow);
+  tempRow = {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2};
+  tempBox.push_back(tempRow);
+  tempRow = {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8};
+  tempBox.push_back(tempRow);
+  tempRow = {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13};
+  tempBox.push_back(tempRow);
+  sBoxes.push_back(tempBox);
+
+  vector<vector<bool>> charGroups;
   vector<bool> outputvector;
-  for(int i=0; i < 48;)
+  for(int i=0; i < charGroupCount; i++)
   {
     vector<bool> temp;
-    for(int j=0; j<6; j++)
+    for(int j=0; j< charsInGroup; j++)
     {
-      temp.push_back(rightTextI.at(i));
-      i++;
+      temp.push_back(rightTextI.at((i * charsInGroup) + j));
     }
-    sboxes.push_back(temp);
+    charGroups.push_back(temp);
   }
 
-  for(int j=0; j <8; j++)
+  for(int j=0; j <charGroupCount; j++)
   {
     string rowstring;
     string colstring;
-    rowstring.append(sboxes.at(j).at(0) ? "1" : "0");
-    rowstring.append(sboxes.at(j).at(5) ? "1" : "0");
+    rowstring.append(charGroups.at(j).at(0) ? "1" : "0");
+    rowstring.append(charGroups.at(j).at(5) ? "1" : "0");
     for(int i = 1; i <5; i++)
     {
-      colstring.append(sboxes.at(j).at(i) ? "1" : "0");
+      colstring.append(charGroups.at(j).at(i) ? "1" : "0");
     }
     bitset<2> row (rowstring);
     bitset<4> col (colstring);
     bitset<4> newbinary;
-    if (j == 0)
+    newbinary = sBoxes.at(j).at(row.to_ulong()).at(col.to_ulong());
+    cout << "SBOXES ";
+    for(int i=3; i>=0; i--)
     {
-      newbinary= (s1[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 1)
-    {
-      newbinary= (s2[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 2)
-    {
-      newbinary= (s3[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 3)
-    {
-      newbinary= (s4[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 4)
-    {
-      newbinary= (s5[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 5)
-    {
-      newbinary= (s6[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 6)
-    {
-      newbinary= (s7[row.to_ulong()][col.to_ulong()]);
-    }
-    if (j == 7)
-    {
-     newbinary= (s8[row.to_ulong()][col.to_ulong()]);
-    }
-
-    for(int i=0; i<4; i++)
-    {
+      cout << (newbinary[i] ? "1" : "0") << " ";
       outputvector.push_back(newbinary[i]);
     }
+    cout << endl;
 
   }
 
@@ -318,14 +350,18 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   for (int i = 0; i < CHARS_IN_BLOCK; i++)
   {
     string tempString = "";
+    cout << "0\n";
     for (int j = 0; j < BITS_IN_CHAR; j++)
     {
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
+      cout << (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0") << " ";
     }
+    cout << "\n1\n" << tempString << endl;
     bitset<BITS_IN_CHAR> temp(tempString);
-    cryptText += static_cast<char>(bitset<BITS_IN_CHAR>(temp.to_string()).to_ulong());
+    cryptText += (char)temp.to_ulong();
+    cout << "2" << "\n" << char(temp.to_ulong()) << endl;
   }
-  cout << cryptText;
+  cout << "3 " << cryptText << endl;
   return cryptText;
 }
 
@@ -386,9 +422,8 @@ string decrypt(vector<bool> cipherTextBits, vector<bool> keyBits)
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
     }
     bitset<BITS_IN_CHAR> temp(tempString);
-    plainText += static_cast<char>(bitset<BITS_IN_CHAR>(temp.to_string()).to_ulong());
+    plainText += (char)temp.to_ulong();
   }
-
   return plainText;
 }
 
@@ -427,14 +462,26 @@ int main()
         }
 
         vector<bool> keyBits;
+        bitset<64> tempSet('A');
+        string tempString = tempSet.to_string();
+        cout << tempString << endl;
+        //TODO Reverse loops?
+        for (int j = 63; j >= 0; j--)
+        {
+          keyBits.push_back(tempSet[j]);
+          cout << tempSet[j] << " ";
+        }
+        cout << endl;
+        /*
         for (short i = 0; i < CHARS_IN_BLOCK; i++)
         {
           bitset<BITS_IN_CHAR> temp(keyVector.at(i));
-          for(short j = 0; j<BITS_IN_CHAR; j++)
+          for(short j = BITS_IN_CHAR - 1; j >= 0; j--)
           {
             keyBits.push_back(temp[j]);
           }
         }
+        */
 
         // Pad plaintext so you have full groups of 64 bits
         short charsToPad = CHARS_IN_BLOCK - (plainText.size() % CHARS_IN_BLOCK);
@@ -450,7 +497,7 @@ int main()
           for (short j = 0; j < CHARS_IN_BLOCK; j++)
           {
             bitset<BITS_IN_CHAR> temp(plainText.at((i*CHARS_IN_BLOCK)+j));
-            for(short k = 0; k<BITS_IN_CHAR; k++)
+            for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
             {
               curCharGroup.push_back(temp[k]);
             }
@@ -506,7 +553,7 @@ int main()
         for (short i = 0; i < CHARS_IN_BLOCK; i++)
         {
           bitset<BITS_IN_CHAR> temp(keyVector.at(i));
-          for(short j = 0; j<BITS_IN_CHAR; j++)
+          for(short j = BITS_IN_CHAR - 1; j >= 0; j--)
           {
             keyBits.push_back(temp[j]);
           }
@@ -520,7 +567,7 @@ int main()
           for (short j = 0; j < CHARS_IN_BLOCK; j++)
           {
             bitset<BITS_IN_CHAR> temp(cipherText.at((i*CHARS_IN_BLOCK)+j));
-            for(short k = 0; k<BITS_IN_CHAR; k++)
+            for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
             {
               curCharGroup.push_back(temp[k]);
             }
