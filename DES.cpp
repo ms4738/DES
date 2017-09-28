@@ -8,6 +8,7 @@ using namespace std;
 const short CHARS_IN_BLOCK = 8;
 const short BITS_IN_CHAR = 8;
 const short ROUND_COUNT = 8;
+const bool VERBOSE = false;
 
 //IP Table, takes in vector of size 64, permutes it, and modifies
 //left and right vectors passed by reference to give plaintext halves
@@ -19,7 +20,7 @@ void initPerm(vector<bool> inputVector, vector<bool>& leftText,
                       60,52,44,36,28,20,12,4,
                       62,54,46,38,30,22,14,6,
                       64,56,48,40,32,24,16,8,
-                      57,49,41,33,25,17,9,1,
+                      57,49,41,33,25,17,9, 1,
                       59,51,43,35,27,19,11,3,
                       61,53,45,37,29,21,13,5,
                       63,55,47,39,31,23,15,7};
@@ -51,49 +52,10 @@ vector<bool> invInitPerm(vector<bool> inputVector)
                          35,3,43,11,51,19,59,27,
                          34,2,42,10,50,18,58,26,
                          33,1,41,9,49,17,57,25};
-  vector<bool> vec;
+  vector<bool> outputVector;
   for(short i=0; i < outputVectorSize; i++)
   {
-    vec.push_back(inputVector.at(invInitPerm[i]-1));
-  }
-  return vec;
-}
-
-//Takes in a vector of size 32, expands and permutes it with a hard-coded table,
-//and returns a vector of size 48
-vector<bool> eTablePerm(vector<bool> inputVector)
-{
-  short outputVectorSize = 48;
-  short eTable[outputVectorSize] = {32, 1,  2,  3,  4,  5,
-                                    4,  5,  6,  7,  8,  9,
-                                    8,  9,  10, 11, 12, 13,
-                                    12, 13, 14, 15, 16, 17,
-                                    16, 17, 18, 19, 20, 21,
-                                    20, 21, 22, 23, 24, 25,
-                                    24, 25, 26, 27, 28, 29,
-                                    28, 29, 30, 31, 32, 1};
-  vector<bool> outputVector;
-
-  for (short i = 0; i < outputVectorSize; i++)
-  {
-    outputVector.push_back(inputVector.at(eTable[i] - 1));
-  }
-  return outputVector;
-}
-
-//Takes in vector of size 32, permutes it using a hard-coded table,
-//and returns another vector of size 32
-vector<bool> pTablePerm(vector<bool> inputVector)
-{
-  short outputVectorSize = 32;
-  short pTable[outputVectorSize] = {16, 7,  20, 21, 29, 12, 28, 17,
-                                    1,  15, 23, 26, 5,  18, 31, 10,
-                                    2,  8,  24, 14, 32, 27, 3,  9,
-                                    19, 13, 30, 6,  22, 11, 4,  25};
-  vector<bool> outputVector;
-  for (short i = 0; i < outputVectorSize; i++)
-  {
-    outputVector.push_back(inputVector.at(pTable[i] - 1));
+    outputVector.push_back(inputVector.at(invInitPerm[i]-1));
   }
   return outputVector;
 }
@@ -104,21 +66,38 @@ void pc1Perm(vector<bool> keyBits, vector<bool>& leftKey, vector<bool>& rightKey
 {
   short pcOneSize = 56;
   short pcOne[]= {57,49,41,33,25,17,9,
-                  1,58,50,42,34,26,18,
-                  10,2,59,51,43,35,27,
-                  19,11,3,60,52,44,36,
+                  1, 58,50,42,34,26,18,
+                  10,2, 59,51,43,35,27,
+                  19,11,3, 60,52,44,36,
                   63,55,47,39,31,23,15,
-                  7,62,54,46,38,30,22,
-                  14,6,61,53,45,37,29,
-                  21,13,5,28,20,12,4};
-  for(int i=0; i<pcOneSize / 2; i++)
+                  7, 62,54,46,38,30,22,
+                  14,6, 61,53,45,37,29,
+                  21,13,5, 28,20,12,4};
+  for(short i = 0; i < pcOneSize / 2; i++)
   {
     leftKey.push_back(keyBits.at(pcOne[i]-1));
   }
-  for(int i=pcOneSize / 2; i<pcOneSize; i++)
+  for(short i = pcOneSize / 2; i < pcOneSize; i++)
   {
     rightKey.push_back(keyBits.at(pcOne[i]-1));
   }
+}
+
+//Key shift scheduler, takes in key halves and shifts them by a specified
+//number of bits based on the current round of encryption
+vector<bool> leftShiftSched(vector<bool> inputVector, short round)
+{
+   short schedule[] = {1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};
+   vector<bool> outputVector;
+   for (unsigned short i = schedule[round]; i < inputVector.size(); i++ )
+   {
+     outputVector.push_back(inputVector.at(i));
+   }
+   for(short i = 0; i < schedule[round]; i++)
+   {
+     outputVector.push_back(inputVector.at(i));
+   }
+   return outputVector;
 }
 
 //PC2 Table, takes in key halves vectors of size 28 each, permutes them,
@@ -128,18 +107,40 @@ vector<bool> pc2Perm(vector<bool> leftKey, vector<bool> rightKey)
   vector<bool> combinedKey = leftKey;
   combinedKey.insert(combinedKey.end(), rightKey.begin(), rightKey.end());
   short pcTwoSize = 48;
-  short pcTwo[]= {14,17,11,24,1,5,3,28,
-                  15,6,21,10,23,19,12,4,
-                  26,8,16,7,27,20,13,2,
+  short pcTwo[]= {14,17,11,24,1, 5, 3, 28,
+                  15,6, 21,10,23,19,12,4,
+                  26,8, 16,7, 27,20,13,2,
                   41,52,31,37,47,55,30,40,
                   51,45,33,48,44,49,39,56,
                   34,53,46,42,50,36,29,32};
-  vector<bool> outputvector;
-  for(int i=0; i<pcTwoSize; i++)
+  vector<bool> outputVector;
+  for(short i=0; i<pcTwoSize; i++)
   {
-    outputvector.push_back(combinedKey.at(pcTwo[i]-1));
+    outputVector.push_back(combinedKey.at(pcTwo[i]-1));
   }
-  return outputvector;
+  return outputVector;
+}
+
+//Takes in a vector of size 32, expands and permutes it with a hard-coded table,
+//and returns a vector of size 48
+vector<bool> eTablePerm(vector<bool> inputVector)
+{
+  short outputVectorSize = 48;
+  short eTable[outputVectorSize] = {32,1, 2, 3, 4, 5,
+                                    4, 5, 6, 7, 8, 9,
+                                    8, 9, 10,11,12,13,
+                                    12,13,14,15,16,17,
+                                    16,17,18,19,20,21,
+                                    20,21,22,23,24,25,
+                                    24,25,26,27,28,29,
+                                    28,29,30,31,32,1};
+  vector<bool> outputVector;
+
+  for (short i = 0; i < outputVectorSize; i++)
+  {
+    outputVector.push_back(inputVector.at(eTable[i] - 1));
+  }
+  return outputVector;
 }
 
 //S Boxes, takes in vector of the right half of the plaintext of size 48
@@ -248,69 +249,58 @@ vector<bool> sBoxSub(vector<bool> rightTextI)
 
   vector<vector<bool>> charGroups;
   vector<bool> outputVector;
-  for(int i=0; i < charGroupCount; i++)
+  for(short i=0; i < charGroupCount; i++)
   {
     vector<bool> temp;
-    for(int j=0; j< charsInGroup; j++)
+    for(short j = 0; j < charsInGroup; j++)
     {
       temp.push_back(rightTextI.at((i * charsInGroup) + j));
     }
     charGroups.push_back(temp);
   }
 
-  for(int j=0; j <charGroupCount; j++)
+  for(short j = 0; j < charGroupCount; j++)
   {
     string rowString;
     string colString;
+    short outputBitCount = 4;
     rowString.append(charGroups.at(j).at(0) ? "1" : "0");
     rowString.append(charGroups.at(j).at(charsInGroup - 1) ? "1" : "0");
-    for(int i = 1; i <5; i++)
+    for(short i = 1; i <5; i++)
     {
       colString.append(charGroups.at(j).at(i) ? "1" : "0");
     }
     bitset<2> row (rowString);
     bitset<4> col (colString);
-    bitset<4> newBinary;
-    newBinary = sBoxes.at(j).at(row.to_ulong()).at(col.to_ulong());
-    //cout << "row: " << rowString << " col: " << colString << " SBox: " << j+1 << " Permuted: ";
-    for(int i=3; i>=0; i--)
+    bitset<4> newBinary(sBoxes.at(j).at(row.to_ulong()).at(col.to_ulong()));
+    for(short i = outputBitCount - 1; i >= 0; i--)
     {
-      //cout << (newBinary[i] ? "1" : "0") << " ";
       outputVector.push_back(newBinary[i]);
     }
-    /*
-    cout << "Vec: ";
-    for (unsigned int i = 0; i < outputvector.size(); i++)
-    {
-      cout << (outputVector.at(i) ? "1" : "0");
-    }
-    cout << endl;
-    */
   }
-
   return outputVector;
 }
 
-//Key shift scheduler, takes in key halves and shifts them by a specified
-//number of bits based on the current round of encryption
-vector<bool> leftShiftSched(vector<bool> inputVector, short round)
+//Takes in vector of size 32, permutes it using a hard-coded table,
+//and returns another vector of size 32
+vector<bool> pTablePerm(vector<bool> inputVector)
 {
-   short schedule[] = {1,1,2,2,2,2,2,2,1,2,2,2,2,2,2,1};
-   vector<bool> outputvector;
-   for (unsigned int i= schedule[round]; i < inputVector.size(); i++ )
-   {
-     outputvector.push_back(inputVector.at(i));
-   }
-   for(int i=0; i < schedule[round]; i++)
-   {
-     outputvector.push_back(inputVector.at(i));
-   }
-   return outputvector;
+  short outputVectorSize = 32;
+  short pTable[outputVectorSize] = {16, 7,  20, 21, 29, 12, 28, 17,
+                                    1,  15, 23, 26, 5,  18, 31, 10,
+                                    2,  8,  24, 14, 32, 27, 3,  9,
+                                    19, 13, 30, 6,  22, 11, 4,  25};
+  vector<bool> outputVector;
+  for (short i = 0; i < outputVectorSize; i++)
+  {
+    outputVector.push_back(inputVector.at(pTable[i] - 1));
+  }
+  return outputVector;
 }
 
 void printVector(vector<bool> inputVec)
 {
-  for (unsigned int i = 0; i < inputVec.size(); i++)
+  for (unsigned  i = 0; i < inputVec.size(); i++)
   {
     cout << inputVec.at(i);
     if (((i + 1) % 8 == 0) && (i != 0))
@@ -326,7 +316,7 @@ void printVector(vector<bool> inputVec)
 //input block of plaintext
 string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
 {
-  string cryptText;
+  string cipherText;
 
   vector<bool> leftTextI;
   vector<bool> rightTextI;
@@ -337,95 +327,137 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   initPerm(plainTextBits, leftTextI, rightTextI);
   pc1Perm(keyBits, leftKey, rightKey);
 
-  cout << "Original plaintext: \n";
-  printVector(plainTextBits);
-  cout << "Original key: \n";
-  printVector(keyBits);
+  if (VERBOSE)
+  {
+    cout << "Original plaintext: \n";
+    printVector(plainTextBits);
+    cout << "Original key: \n";
+    printVector(keyBits);
 
-  cout << "Left half plaintext after init perm\n";
-  printVector(leftTextI);
-  cout << "Right half plaintext after init perm\n";
-  printVector(rightTextI);
-  cout << "left half plaintext after init perm\n";
-  printVector(leftTextI);
-  cout <<"left half key after pc1Perm: \n";
-  printVector(leftKey);
-  cout << "right half key after pc1Perm: \n";
-  printVector(rightKey);
+    cout << "Left half plaintext after init perm\n";
+    printVector(leftTextI);
+    cout << "Right half plaintext after init perm\n";
+    printVector(rightTextI);
+    cout << "left half plaintext after init perm\n";
+    printVector(leftTextI);
+    cout <<"left half key after pc1Perm: \n";
+    printVector(leftKey);
+    cout << "right half key after pc1Perm: \n";
+    printVector(rightKey);
+  }
 
 
   for (short i = 0; i < ROUND_COUNT; i++)
   {
-    cout << endl;
-    cout << "Current round: " << i << endl;
-    cout << endl;
+    if (VERBOSE)
+    {
+      cout << endl;
+      cout << "Current round: " << i << endl;
+      cout << endl;
+    }
     leftTextIPlus1 = rightTextI;
     //Right text is permuted and expanded to 48 bits
     rightTextI = eTablePerm(rightTextI);
-    cout  << "right half after etable:\n";
-    printVector(rightTextI);
+    if (VERBOSE)
+    {
+      cout  << "right half after etable:\n";
+      printVector(rightTextI);
+    }
     //PC-2 Table permutation for keys, also now 48 bits
     leftKey = leftShiftSched(leftKey, i);
     rightKey = leftShiftSched(rightKey, i);
-    cout << "left key after shift:\n";
-    printVector(leftKey);
-    cout << "right key after shift:\n";
-    printVector(rightKey);
+    if (VERBOSE)
+    {
+      cout << "left key after shift:\n";
+      printVector(leftKey);
+      cout << "right key after shift:\n";
+      printVector(rightKey);
+    }
     permKey = pc2Perm(leftKey, rightKey);
-    cout << "key after pc2perm:\n";
-    printVector(permKey);
+    if (VERBOSE)
+    {
+      cout << "key after pc2perm:\n";
+      printVector(permKey);
+    }
     for (unsigned short j = 0; j < rightTextI.size(); j++)
     {
       //XOR each bit of the right text with the key
       rightTextI.at(j) = rightTextI.at(j)^permKey.at(j);
     }
-    cout << "Right text after first xor:\n";
-    printVector(rightTextI);
+    if (VERBOSE)
+    {
+      cout << "Right text after first xor:\n";
+      printVector(rightTextI);
+    }
     rightTextI = sBoxSub(rightTextI);
-    cout << "Right text after sboxes:\n";
-    printVector(rightTextI);
+    if (VERBOSE)
+    {
+      cout << "Right text after sboxes:\n";
+      printVector(rightTextI);
+    }
     rightTextI = pTablePerm(rightTextI);
-    cout << "Right text after ptable:\n";
-    printVector(rightTextI);
-    cout << "left text:\n";
-    printVector(leftTextI);
+    if (VERBOSE)
+    {
+      cout << "Right text after ptable:\n";
+      printVector(rightTextI);
+      cout << "left text:\n";
+      printVector(leftTextI);
+    }
     for (unsigned short j = 0; j < rightTextI.size(); j++)
     {
       //XOR each bit of the right text with the key
       rightTextI.at(j) = rightTextI.at(j)^leftTextI.at(j);
     }
-    cout << "text after second xor:\n";
-    printVector(rightTextI);
+    if (VERBOSE)
+    {
+      cout << "text after second xor:\n";
+      printVector(rightTextI);
+    }
     leftTextI = leftTextIPlus1;
-    cout << "left text i plus 1:\n";
-    printVector(leftTextI);
+    if (VERBOSE)
+    {
+      cout << "left text i plus 1:\n";
+      printVector(leftTextI);
+    }
   }
   //32-bit swap
   rightTextI.insert(rightTextI.end(), leftTextI.begin(), leftTextI.end());
-  cout << "text after 32 bit swap:\n";
-  printVector(rightTextI);
+  if (VERBOSE)
+  {
+    cout << "text after 32 bit swap:\n";
+    printVector(rightTextI);
+  }
   //Inverse IP Table
   rightTextI = invInitPerm(rightTextI);
-  cout << "text after inverse ip table:\n";
-  printVector(rightTextI);
+  if (VERBOSE)
+  {
+    cout << "text after inverse ip table:\n";
+    printVector(rightTextI);
+  }
 
   //Converting binary back into chars
-  for (int i = 0; i < CHARS_IN_BLOCK; i++)
+  for (short i = 0; i < CHARS_IN_BLOCK; i++)
   {
     string tempString = "";
     //cout << "0\n";
-    for (int j = 0; j < BITS_IN_CHAR; j++)
+    for (short j = 0; j < BITS_IN_CHAR; j++)
     {
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
       //cout << (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0") << " ";
     }
   //  cout << "\n1\n" << tempString << endl;
     bitset<BITS_IN_CHAR> temp(tempString);
-    cryptText += (char)temp.to_ulong();
-    cout << "2" << "\n" << char(temp.to_ulong()) << endl;
+    cipherText += (char)temp.to_ulong();
+    if (VERBOSE)
+    {
+      cout << "Current char:\n" << char(temp.to_ulong()) << endl;
+    }
   }
-//  cout << "3 " << cryptText << endl;
-  return cryptText;
+  if (VERBOSE)
+  {
+    cout << cipherText << endl;
+  }
+  return cipherText;
 }
 
 string decrypt(vector<bool> cipherTextBits, vector<bool> keyBits)
@@ -477,10 +509,10 @@ string decrypt(vector<bool> cipherTextBits, vector<bool> keyBits)
 
 
   //Converting binary back into chars
-  for (int i = 0; i < CHARS_IN_BLOCK; i++)
+  for (short i = 0; i < CHARS_IN_BLOCK; i++)
   {
     string tempString = "";
-    for (int j = 0; j < BITS_IN_CHAR; j++)
+    for (short j = 0; j < BITS_IN_CHAR; j++)
     {
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
     }
@@ -490,172 +522,149 @@ string decrypt(vector<bool> cipherTextBits, vector<bool> keyBits)
   return plainText;
 }
 
+vector<char> readInput(string inFileName)
+{
+  ifstream inTextFileStream;
+  inTextFileStream.open(inFileName);
+  vector<char> readText;
+  if (inTextFileStream.is_open())
+  {
+    char c;
+    while (inTextFileStream.get(c))
+    {
+      readText.push_back(c);
+    }
+    inTextFileStream.close();
+    short charsToPad = CHARS_IN_BLOCK - (readText.size() % CHARS_IN_BLOCK);
+    if (charsToPad != CHARS_IN_BLOCK)
+    {
+      for(short i = 0; i < charsToPad; i++)
+      {
+        readText.push_back('x');
+      }
+    }
+  }
+  else
+  {
+    cout << "The file " << inFileName << "was not able to be opened." << endl;
+    inTextFileStream.close();
+  }
+  return readText;
+}
+
+void writeOutput(string inputString, string fileName)
+{
+  // output text text to file with name passed as argument
+  ofstream outTextFileStream;
+  outTextFileStream.open(fileName, std::ofstream::out | std::ofstream::trunc);
+  // TODO: If file is open
+  if (outTextFileStream.is_open())
+  {
+    for(unsigned short i = 0; i < inputString.size(); i++)
+    {
+      outTextFileStream << inputString[i];
+    }
+    outTextFileStream.close();
+  }
+  else
+  {
+    cout << "Could not write to file " << fileName << "." << endl;
+    outTextFileStream.close();
+  }
+}
+
+vector<bool> charsToBits(vector<char> inputVector)
+{
+  vector<bool> outputVector;
+  for (short i = 0; i < CHARS_IN_BLOCK; i++)
+  {
+    bitset<BITS_IN_CHAR> temp(inputVector.at(i));
+    for(short j = BITS_IN_CHAR - 1; j >= 0; j--)
+    {
+      outputVector.push_back(temp[j]);
+    }
+  }
+  return outputVector;
+}
+
 int main()
 {
-  cout << "Please enter \'e\' to encrypt or \'d\' to decrypt." << endl;
-  char mode;
-  cin >> mode;
-  do
+  string ptFileName = "pt.txt";
+  string keyFileName = "key.txt";
+  string encryptOutFileName = "encryptResults.txt";
+  string decryptOutFileName = "decryptResults.txt";
+  bool stillLooping = true;
+  while (stillLooping)
   {
+    cout << "Please enter \'e\' to encrypt, \'d\' " <<
+      "to decrypt, or \'q\' to quit." << endl;
+    char mode;
+    cin >> mode;
     if (mode == 'e')
     {
-      ifstream plainTextFileStream;
-      plainTextFileStream.open("pt.txt");
-
-      if (plainTextFileStream.is_open())
+      vector<char> plainText = readInput(ptFileName);
+      vector<char> keyText = readInput(keyFileName);
+      if ((plainText.size() == 0) || (keyText.size() == 0))
       {
-        char c;
-        vector<char> plainText;
-        while (plainTextFileStream.get(c))
-        {
-          plainText.push_back(c);
-        }
-        plainTextFileStream.close();
-
-        vector<char> keyVector;
-        ifstream keyFileStream;
-        keyFileStream.open("key.txt");
-        //TODO give else statement for failed key file opening
-        if (keyFileStream.is_open())
-        {
-          while (keyFileStream.get(c))
-          {
-            keyVector.push_back(c);
-          }
-        }
-
-        vector<bool> keyBits;
-        bitset<64> tempSet('A');
-        //TODO Reverse loops?
-        for (int j = 63; j >= 0; j--)
-        {
-          keyBits.push_back(tempSet[j]);
-        }
-        /*
-        for (short i = 0; i < CHARS_IN_BLOCK; i++)
-        {
-          bitset<BITS_IN_CHAR> temp(keyVector.at(i));
-          for(short j = BITS_IN_CHAR - 1; j >= 0; j--)
-          {
-            keyBits.push_back(temp[j]);
-          }
-        }
-        */
-
-        // Pad plaintext so you have full groups of 64 bits
-        short charsToPad = CHARS_IN_BLOCK - (plainText.size() % CHARS_IN_BLOCK);
-        for(short i=0; i<charsToPad; i++)
-        {
-          plainText.push_back('x');
-        }
-        short charGroupCount = plainText.size()/CHARS_IN_BLOCK;
-        string cipherText = "";
-        for (short i = 0; i < charGroupCount; i++)
-        {
-          vector<bool> curCharGroup;
-          for (short j = 0; j < CHARS_IN_BLOCK; j++)
-          {
-            bitset<BITS_IN_CHAR> temp(plainText.at((i*CHARS_IN_BLOCK)+j));
-            for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
-            {
-              curCharGroup.push_back(temp[k]);
-            }
-          }
-          cipherText += encrypt(curCharGroup, keyBits);
-        }
-        // output cipher text to encryptResults.txt
-        ofstream cipherTextFileStream;
-        cipherTextFileStream.open("encryptResults.txt", std::ofstream::out | std::ofstream::trunc);
-        // TODO: If file is open
-        for(unsigned short i=0; i < cipherText.size(); i++)
-        {
-          cipherTextFileStream << cipherText[i];
-        }
-        cipherTextFileStream.close();
-        // End Encryption
+        cout << "Read input of text or key was of length 0.\n";
+        return 0;
       }
-      else
+      vector<bool> keyBits = charsToBits(keyText);
+      short charGroupCount = plainText.size() / CHARS_IN_BLOCK;
+      string cipherText = "";
+      for (short i = 0; i < charGroupCount; i++)
       {
-        cout << "The file was not able to be opened." << endl;
-        plainTextFileStream.close();
+        vector<bool> curCharGroup;
+        for (short j = 0; j < CHARS_IN_BLOCK; j++)
+        {
+          bitset<BITS_IN_CHAR> temp(plainText.at((i*CHARS_IN_BLOCK)+j));
+          for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
+          {
+            curCharGroup.push_back(temp[k]);
+          }
+        }
+        cipherText += encrypt(curCharGroup, keyBits);
       }
-      return 0;
+      writeOutput(cipherText, encryptOutFileName);
+      cout << "File encrypted to " << encryptOutFileName << "." << endl;
     }
     else if (mode == 'd')
     {
-      ifstream cipherTextFileStream;
-      cipherTextFileStream.open("encryptResults.txt");
-
-      if (cipherTextFileStream.is_open())
+      vector<char> cipherText = readInput(encryptOutFileName);
+      vector<char> keyText = readInput(keyFileName);
+      if ((cipherText.size() == 0) || (keyText.size() == 0))
       {
-        char c;
-        vector<char> cipherText;
-        while (cipherTextFileStream.get(c))
-        {
-          cipherText.push_back(c);
-        }
-        cipherTextFileStream.close();
-
-        vector<char> keyVector;
-        ifstream keyFileStream;
-        keyFileStream.open("key.txt");
-        //TODO give else statement for failed key file opening
-        if (keyFileStream.is_open())
-        {
-          while (keyFileStream.get(c))
-          {
-            keyVector.push_back(c);
-          }
-        }
-
-        vector<bool> keyBits;
-        for (short i = 0; i < CHARS_IN_BLOCK; i++)
-        {
-          bitset<BITS_IN_CHAR> temp(keyVector.at(i));
-          for(short j = BITS_IN_CHAR - 1; j >= 0; j--)
-          {
-            keyBits.push_back(temp[j]);
-          }
-        }
-
-        short charGroupCount = cipherText.size()/CHARS_IN_BLOCK;
-        string plainText = "";
-        for (short i = 0; i < charGroupCount; i++)
-        {
-          vector<bool> curCharGroup;
-          for (short j = 0; j < CHARS_IN_BLOCK; j++)
-          {
-            bitset<BITS_IN_CHAR> temp(cipherText.at((i*CHARS_IN_BLOCK)+j));
-            for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
-            {
-              curCharGroup.push_back(temp[k]);
-            }
-          }
-          plainText += decrypt(curCharGroup, keyBits);
-        }
-
-        // output plaintext to decryptResults.txt
-        ofstream plainTextFileStream;
-        plainTextFileStream.open("decryptResults.txt", std::ofstream::out | std::ofstream::trunc);
-        // TODO: If file is open
-        for(unsigned short i=0; i < plainText.size(); i++)
-        {
-          plainTextFileStream << plainText[i];
-        }
-        plainTextFileStream.close();
-        // End Encryption
+        return 0;
       }
-      else
+      vector<bool> keyBits = charsToBits(keyText);
+
+      short charGroupCount = cipherText.size()/CHARS_IN_BLOCK;
+      string plainText = "";
+      for (short i = 0; i < charGroupCount; i++)
       {
-        cout << "The file was not able to be opened." << endl;
-        cipherTextFileStream.close();
+        vector<bool> curCharGroup;
+        for (short j = 0; j < CHARS_IN_BLOCK; j++)
+        {
+          bitset<BITS_IN_CHAR> temp(cipherText.at((i*CHARS_IN_BLOCK)+j));
+          for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
+          {
+            curCharGroup.push_back(temp[k]);
+          }
+        }
+        plainText += decrypt(curCharGroup, keyBits);
       }
-      return 0;
+      writeOutput(plainText, decryptOutFileName);
+      cout << "File decrypted to " << decryptOutFileName << "." << endl;
     }
-    // Input not e or d. Try again
-    cout << "Please enter \'e\' to encrypt or \'d\' to decrypt." << endl;
-    cin >> mode;
+    else if (mode == 'q')
+    {
+      stillLooping = false;
+    }
+    else
+    {
+      cout << "Input must either be \'e\', \'d\', or \'q\'. " <<
+        "Please try again." << endl;
+    }
   }
-  while (mode != 'e' || mode != 'd');
   return 0;
 }
