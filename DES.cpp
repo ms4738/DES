@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <bitset>
+#include <time.h>
 using namespace std;
 
 const short CHARS_IN_BLOCK = 8;
@@ -600,6 +601,7 @@ int main()
     cin >> mode;
     if (mode == 'e')
     {
+      clock_t startClock = clock();
       vector<char> plainText = readInput(ptFileName);
       vector<char> keyText = readInput(keyFileName);
       if ((plainText.size() == 0) || (keyText.size() == 0))
@@ -613,21 +615,24 @@ int main()
       for (short i = 0; i < charGroupCount; i++)
       {
         vector<bool> curCharGroup;
+        vector<char> curGroupChars;
         for (short j = 0; j < CHARS_IN_BLOCK; j++)
         {
-          bitset<BITS_IN_CHAR> temp(plainText.at((i*CHARS_IN_BLOCK)+j));
-          for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
-          {
-            curCharGroup.push_back(temp[k]);
-          }
+          curGroupChars.push_back(cipherText.at((i*CHARS_IN_BLOCK)+j));
         }
+        curCharGroup = charsToBits(curGroupChars);
         cipherText += encrypt(curCharGroup, keyBits);
       }
       writeOutput(cipherText, encryptOutFileName);
+      clock_t timeElapsed = clock() - (float)startClock;
       cout << "File encrypted to " << encryptOutFileName << "." << endl;
+      cout << "Time elapsed for encryption was " <<
+        (float)timeElapsed / CLOCKS_PER_SEC << " seconds." << endl;
+
     }
     else if (mode == 'd')
     {
+      clock_t startClock = clock();
       vector<char> cipherText = readInput(encryptOutFileName);
       vector<char> keyText = readInput(keyFileName);
       if ((cipherText.size() == 0) || (keyText.size() == 0))
@@ -641,18 +646,19 @@ int main()
       for (short i = 0; i < charGroupCount; i++)
       {
         vector<bool> curCharGroup;
+        vector<char> curGroupChars;
         for (short j = 0; j < CHARS_IN_BLOCK; j++)
         {
-          bitset<BITS_IN_CHAR> temp(cipherText.at((i*CHARS_IN_BLOCK)+j));
-          for(short k = BITS_IN_CHAR - 1; k >= 0; k--)
-          {
-            curCharGroup.push_back(temp[k]);
-          }
+          curGroupChars.push_back(cipherText.at((i*CHARS_IN_BLOCK)+j));
         }
+        curCharGroup = charsToBits(curGroupChars);
         plainText += decrypt(curCharGroup, keyBits);
       }
       writeOutput(plainText, decryptOutFileName);
+      clock_t timeElapsed = clock() - (float)startClock;
       cout << "File decrypted to " << decryptOutFileName << "." << endl;
+      cout << "Time elapsed for decryption was " <<
+        (float)timeElapsed / CLOCKS_PER_SEC << " seconds." << endl;
     }
     else if (mode == 'q')
     {
