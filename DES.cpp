@@ -62,7 +62,8 @@ vector<bool> invInitPerm(vector<bool> inputVector)
 
 //PC1 Table, takes in vector of size 64, permutes it to size 56, and modifies
 //halves passed by reference to give initial key halves
-void pc1Perm(vector<bool> keyBits, vector<bool>& leftKey, vector<bool>& rightKey)
+void pc1Perm(vector<bool> keyBits, vector<bool>& leftKey,
+  vector<bool>& rightKey)
 {
   short pcOneSize = 56;
   short pcOne[]= {57,49,41,33,25,17,9,
@@ -439,13 +440,10 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   for (short i = 0; i < CHARS_IN_BLOCK; i++)
   {
     string tempString = "";
-    //cout << "0\n";
     for (short j = 0; j < BITS_IN_CHAR; j++)
     {
       tempString += (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0");
-      //cout << (rightTextI.at((i * CHARS_IN_BLOCK) + j) ? "1" : "0") << " ";
     }
-  //  cout << "\n1\n" << tempString << endl;
     bitset<BITS_IN_CHAR> temp(tempString);
     cipherText += (char)temp.to_ulong();
     if (VERBOSE)
