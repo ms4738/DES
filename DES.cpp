@@ -7,7 +7,7 @@ using namespace std;
 
 const short CHARS_IN_BLOCK = 8;
 const short BITS_IN_CHAR = 8;
-const short ROUND_COUNT = 1;
+const short ROUND_COUNT = 8;
 
 //IP Table, takes in vector of size 64, permutes it, and modifies
 //left and right vectors passed by reference to give plaintext halves
@@ -342,6 +342,8 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   cout << "Original key: \n";
   printVector(keyBits);
 
+  cout << "Left half plaintext after init perm\n";
+  printVector(leftTextI);
   cout << "Right half plaintext after init perm\n";
   printVector(rightTextI);
   cout << "left half plaintext after init perm\n";
@@ -385,6 +387,8 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
     rightTextI = pTablePerm(rightTextI);
     cout << "Right text after ptable:\n";
     printVector(rightTextI);
+    cout << "left text:\n";
+    printVector(leftTextI);
     for (unsigned short j = 0; j < rightTextI.size(); j++)
     {
       //XOR each bit of the right text with the key
@@ -393,7 +397,7 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
     cout << "text after second xor:\n";
     printVector(rightTextI);
     leftTextI = leftTextIPlus1;
-    cout << "left text:\n";
+    cout << "left text i plus 1:\n";
     printVector(leftTextI);
   }
   //32-bit swap
@@ -418,7 +422,7 @@ string encrypt(vector<bool> plainTextBits, vector<bool> keyBits)
   //  cout << "\n1\n" << tempString << endl;
     bitset<BITS_IN_CHAR> temp(tempString);
     cryptText += (char)temp.to_ulong();
-    //cout << "2" << "\n" << char(temp.to_ulong()) << endl;
+    cout << "2" << "\n" << char(temp.to_ulong()) << endl;
   }
 //  cout << "3 " << cryptText << endl;
   return cryptText;
