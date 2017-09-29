@@ -1,0 +1,73 @@
+\documentclass[11pt]{article}
+
+\usepackage{setspace}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[parfill]{parskip}
+
+\title{DES - Security Through Obscurity}
+\author{Monica Singh, Matt Frederick, George Wood, Brandon Crane}
+\date{30 September 2017}
+
+\begin{document}
+\maketitle
+
+\thispagestyle{empty}
+
+\section{Individual Contributions}
+Team members did most of the work together. Pair programming was implemented
+in the beginning to code individual modules. Matt and Monica worked together in
+one pair, and George and Brandon in another. These modules were then placed in
+the main file accordingly. Once debugging started, it became
+a whole team effort with everybody analyzing the output. To verify that our
+encryption was working correctly,
+George took it upon himself to run through the algorithm by hand. He worked with
+a very simple key and plaintext. This process was compared to the output of the
+bit strings that our program output before and after steps in the algorithm.
+This processes verified that our encryption was accurate, and we were able to
+continue debugging to completion as a team. Brandon drafted up the latex
+document, and George created the graphs.
+
+
+\section{Time Graphs for 8 Rounds}
+
+\setcounter{secnumdepth}{0}
+\subsection{8 Characters (64 bits)}
+Encryption:
+
+Decryption:
+
+\subsection{8000 Characters (64000 bits)}
+Encryption:
+
+Decryption:
+
+\subsection{80000 Characters (640000 bits)}
+Encryption:
+
+Decryption:
+\setcounter{secnumdepth}{1}
+
+\section{Time Graphs for 16 Rounds}
+
+\setcounter{secnumdepth}{0}
+\subsection{8 Characters (64 bits)}
+Encryption:
+
+Decryption:
+
+\subsection{8000 Characters (64000 bits)}
+Encryption:
+
+Decryption:
+
+\subsection{80000 Characters (640000 bits)}
+Encryption:
+
+Decryption:
+
+
+\setcounter{secnumdepth}{1}
+\section{Code (C++)}
+
+
+\end{document}
