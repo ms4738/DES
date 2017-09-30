@@ -21,6 +21,8 @@ const short ROUND_COUNT = 8;
 //Whether or not testing statements should be printed
 const bool VERBOSE = false;
 
+short blockCount = 0;
+
 //IP Table, takes in vector of size 64, permutes it, and modifies
 //left and right vectors passed by reference to give plaintext halves
 void initPerm(vector<bool> inputVector, vector<bool>& leftText,
@@ -353,10 +355,11 @@ vector<bool> pTablePerm(vector<bool> inputVector)
 }
 
 //Prints out binary values in a vector in separated groups of 8
+//(For testing purposes)
 void printVector(vector<bool> inputVec)
 {
   //Prints each character
-  for (unsigned  i = 0; i < inputVec.size(); i++)
+  for (unsigned int i = 0; i < inputVec.size(); i++)
   {
     cout << inputVec.at(i);
     //Inserts a space between each group of 8
@@ -657,6 +660,7 @@ string decrypt(vector<bool> cipherTextBits, vector<bool> keyBits)
 //Reads input from a text file with specified name
 vector<char> readInput(string inFileName)
 {
+  int charsRead = 0;
   ifstream inTextFileStream;
   inTextFileStream.open(inFileName);
   //Vector to hold read characters
@@ -668,6 +672,7 @@ vector<char> readInput(string inFileName)
     //Pushes current char to readText
     while (inTextFileStream.get(c))
     {
+      charsRead++;
       readText.push_back(c);
     }
     inTextFileStream.close();
@@ -698,8 +703,8 @@ void writeOutput(string inputString, string fileName)
   //If file was successfully opened
   if (outTextFileStream.is_open())
   {
-    //Writes eac character to the file
-    for(unsigned short i = 0; i < inputString.size(); i++)
+    //Writes each character to the file
+    for(unsigned int i = 0; i < inputString.size(); i++)
     {
       outTextFileStream << inputString[i];
     }
@@ -717,7 +722,7 @@ int main()
 {
   //Filenames for input/output text files
   //Available ptFileNames are '8Char.txt', '8000Char.txt', and '80000Char.txt'.
-  string ptFileName = "8Char.txt";
+  string ptFileName = "80000Char.txt";
   string keyFileName = "key.txt";
   string encryptOutFileName = "encryptResults.txt";
   string decryptOutFileName = "decryptResults.txt";
@@ -772,12 +777,14 @@ int main()
       }
       //Writes output ciphertext to text file
       writeOutput(cipherText, encryptOutFileName);
+
       //Gets total execution time
       clock_t timeElapsed = clock() - (float)startClock;
       //Outputs results
       cout << "File encrypted to " << encryptOutFileName << "." << endl;
       cout << "Time elapsed for encryption was " <<
-        (float)timeElapsed << " milliseconds." << endl;
+        (float)((timeElapsed / (float)CLOCKS_PER_SEC) * 1000)
+        << " milliseconds." << endl;
 
     }
     //User wishes to decrypt
@@ -825,7 +832,8 @@ int main()
       //Outputs results
       cout << "File decrypted to " << decryptOutFileName << "." << endl;
       cout << "Time elapsed for decryption was " <<
-        (float)timeElapsed  << " milliseconds." << endl;
+        (float)((timeElapsed / (float)CLOCKS_PER_SEC) * 1000)
+        << " milliseconds." << endl;
     }
     //User wishes to quit
     else if (mode == 'q')
