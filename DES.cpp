@@ -660,7 +660,7 @@ vector<char> readInput(string inFileName)
 {
   int charsRead = 0;
   ifstream inTextFileStream;
-  inTextFileStream.open(inFileName);
+  inTextFileStream.open(inFileName, std::ios::binary);
   //Vector to hold read characters
   vector<char> readText;
   //If file was succesfully opened
@@ -697,7 +697,7 @@ vector<char> readInput(string inFileName)
 void writeOutput(string inputString, string fileName)
 {
   ofstream outTextFileStream;
-  outTextFileStream.open(fileName, std::ofstream::out | std::ofstream::trunc);
+  outTextFileStream.open(fileName, std::ofstream::out | std::ofstream::trunc | std::ios::binary);
   //If file was successfully opened
   if (outTextFileStream.is_open())
   {
@@ -720,7 +720,7 @@ int main()
 {
   //Filenames for input/output text files
   //Available ptFileNames are '8Char.txt', '8000Char.txt', and '80000Char.txt'.
-  string ptFileName = "80000Char.txt";
+  string ptFileName = "8000Char.txt";
   string keyFileName = "key.txt";
   string encryptOutFileName = "encryptResults.txt";
   string decryptOutFileName = "decryptResults.txt";
