@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.9.8)  30 SEP 2017 20:10
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (MiKTeX 2.9) (preloaded format=pdflatex 2016.9.8)  30 SEP 2017 20:32
 entering extended mode
 **./securityThroughObscurity_DESWriteup.tex
 (securityThroughObscurity_DESWriteup.tex
@@ -198,19 +198,19 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 15.
 
-<images/8RoundGraph.png, id=1, 784.9325pt x 381.425pt>
+<images/8RoundGraph.png, id=1, 514.92375pt x 289.83281pt>
 File: images/8RoundGraph.png Graphic file (type png)
 
 <use images/8RoundGraph.png>
 Package pdftex.def Info: images/8RoundGraph.png used on input line 39.
-(pdftex.def)             Requested size: 431.7142pt x 209.7844pt.
+(pdftex.def)             Requested size: 411.93954pt x 231.86655pt.
 
-<images/16RoundGraph.png, id=2, 786.94pt x 383.4325pt>
+<images/16RoundGraph.png, id=3, 515.67656pt x 289.83281pt>
 File: images/16RoundGraph.png Graphic file (type png)
 
 <use images/16RoundGraph.png>
 Package pdftex.def Info: images/16RoundGraph.png used on input line 41.
-(pdftex.def)             Requested size: 432.81834pt x 210.88852pt.
+(pdftex.def)             Requested size: 412.5418pt x 231.86655pt.
  [1
 
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map} <./images/8RoundGraph.png>
@@ -225,7 +225,7 @@ td::ofstream::trunc | std::ios::binary);[]
 Here is how much of TeX's memory you used:
  2021 strings out of 493334
  29776 string characters out of 3136682
- 115412 words of memory out of 3000000
+ 115378 words of memory out of 3000000
  5540 multiletter control sequences out of 15000+200000
  8055 words of font info for 29 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -236,10 +236,10 @@ s (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><E:/Program Files
 6)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><E:/Program Files (x86)/
 MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><E:/Program Files (x86)/MiK
 TeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on securityThroughObscurity_DESWriteup.pdf (20 pages, 128281 byt
+Output written on securityThroughObscurity_DESWriteup.pdf (20 pages, 118999 byt
 es).
 PDF statistics:
- 89 PDF objects out of 1000 (max. 8388607)
+ 92 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
